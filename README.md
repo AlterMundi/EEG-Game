@@ -1,182 +1,321 @@
-# EEG-Game
+# 🧠 Neurofeedback Focus Game - EEG Training App
 
-A Python-based real-time EEG (Electroencephalography) visualization and meditation state detection system using the Muse 2 headband. This project provides tools for receiving, analyzing, and visualizing brainwave data via OSC (Open Sound Control) protocol.
+A web-based neurofeedback game that integrates with the **Muse 2 EEG headband** to train concentration and focus. Using scientifically-backed brain metrics, this app gamifies mental focus training similar to the Mendi device, allowing you to measure concentration levels before and after sound therapy or other interventions.
 
-## Overview
+![Lilac-themed neurofeedback game](webapp/assets/preview.png)
 
-This repository contains tools for:
-- Real-time EEG signal visualization from Muse 2 devices
-- Frequency band analysis (Delta, Theta, Alpha, Beta, Gamma)
-- Meditation/transcendent state detection based on Dr. Joe Dispenza's research
-- OSC-based data streaming and processing
+## ✨ Features
 
-## Project Structure
+- **Real-time EEG Neurofeedback**: Live concentration score based on frontal cortex activity (AF7 & AF8 electrodes)
+- **Scientifically-Backed Metrics**: Composite algorithm using Beta/Alpha ratio, SMR power, and inverted Theta/Beta ratio
+- **Gamified Training**: Visual ball-on-path game that responds to your mental focus
+- **Session Tracking**: Baseline and post-therapy modes with detailed metrics
+- **Data Export**: Export sessions as CSV or JSON for analysis
+- **Comparison View**: Compare baseline vs post-therapy sessions to track improvement
+- **Beautiful UI**: Calming lilac/purple theme designed to promote focus
 
-```
-EEG-Game/
-├── EEG/                          # Main EEG analysis scripts
-│   ├── osc_receiver.py          # Simple OSC receiver with live EEG visualization
-│   ├── dispenza_test.py         # Meditation state detection with overlapped channel view
-│   └── dispenza_stacked.py      # Meditation state detection with stacked channel view
-├── MindMonitorPython/           # Sample OSC receivers (from Mind Monitor)
-│   ├── OSC Receiver.py          # Records EEG data to CSV
-│   ├── OSC Receiver Simple.py   # Displays raw EEG data
-│   ├── OSC Receiver Audio Feedback.py  # Relative wave visualization with audio feedback
-│   ├── bell.mp3                 # Audio feedback sound file
-│   └── LICENSE                  # GPL v3 License
-└── README.md                    # This file
-```
+## 🎯 How It Works
 
-## Features
+### EEG Metrics (Scientifically Validated)
 
-### Real-time Visualization
-- Live plotting of raw EEG signals from all 4 channels (TP9, AF7, AF8, TP10)
-- Stacked or overlapped channel views
-- Auto-scaling y-axis for optimal signal visibility
+This app measures concentration using the same prefrontal cortex activity that fNIRS devices like Mendi target, but with EEG technology:
 
-### Frequency Band Analysis
-- **Delta** (0.5-4 Hz): Deep sleep, unconscious states
-- **Theta** (4-8 Hz): Deep meditation, creativity, REM sleep
-- **Alpha** (8-13 Hz): Relaxed awareness, light meditation
-- **Beta** (13-30 Hz): Active thinking, focus
-- **Gamma** (30-44 Hz): Peak concentration, transcendent states
+**Composite Concentration Score = 50% Beta/Alpha + 30% SMR + 20% Inverted Theta/Beta**
 
-### Meditation State Detection
-The `dispenza_*.py` scripts detect potential transcendent meditation states by monitoring:
-- Elevated theta power (30%+ above baseline)
-- Gamma surges (15%+ above baseline)
-- High theta/beta ratio (>2.0)
-- Frontal theta coherence (>0.75)
+- **Beta/Alpha Engagement Index** (50%): Higher ratio = increased attention and mental engagement
+- **SMR Power 12-15 Hz** (30%): Validated neurofeedback marker for focused attention
+- **Inverted Theta/Beta Ratio** (20%): Lower theta/beta = better executive control and less mind-wandering
 
-## Requirements
+These metrics are measured from the frontal electrodes (AF7 & AF8) on the Muse 2, which correspond to prefrontal cortex activity.
+
+## 📋 Requirements
 
 ### Hardware
 - **Muse 2** EEG headband (or compatible Muse device)
 - Computer with Python 3.7+
+- Smartphone or tablet running **Mind Monitor** app (iOS/Android)
 
-### Software
-- **Mind Monitor** app (iOS/Android) or **Muse Direct** for streaming EEG data via OSC
+### Software Dependencies
+- Python packages: `numpy`, `scipy`, `python-osc`, `websockets`
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- Mind Monitor app for OSC streaming
 
-### Python Dependencies
+## 🚀 Quick Start
+
+### 1. Install Python Dependencies
+
 ```bash
-pip install numpy scipy matplotlib python-osc
-```
-
-Optional (for audio feedback):
-```bash
-pip install playsound
-```
-
-## Installation
-
-1. Clone this repository:
-```bash
-git clone <repository-url>
 cd EEG-Game
-```
-
-2. Install Python dependencies:
-```bash
 pip install -r requirements.txt
 ```
 
-3. Set up your Muse device:
-   - Install Mind Monitor app on your mobile device
-   - Connect your Muse 2 headband
-   - Configure OSC streaming to your computer's IP address on port 5000
+### 2. Configure Mind Monitor
 
-## Usage
+1. Open Mind Monitor app on your phone/tablet
+2. Connect your Muse 2 headband
+3. Go to Settings → OSC Stream Output
+4. Set **Target IP**: Your computer's local IP address (e.g., `192.168.1.100`)
+5. Set **Port**: `5000`
+6. Enable **Raw EEG** (`/muse/eeg`)
+7. Start streaming
 
-### Basic EEG Visualization
+### 3. Start the Backend Server
 
-Run the simple OSC receiver to visualize raw EEG signals:
 ```bash
-python EEG/osc_receiver.py
+# Start WebSocket server
+python websocket_server.py
 ```
 
-### Meditation State Detection
-
-For meditation state detection with baseline calibration:
-
-**Stacked channel view:**
-```bash
-python EEG/dispenza_stacked.py
+You should see:
+```
+OSC server listening on 0.0.0.0:5000
+Starting WebSocket server on port 8765
 ```
 
-**Overlapped channel view:**
+### 4. Start the Web App
+
 ```bash
-python EEG/dispenza_test.py
+# In a new terminal, serve the web app
+cd webapp
+python -m http.server 8000
 ```
 
-**Process:**
-1. The script will collect a 30-second baseline (relax, eyes closed, no meditation)
-2. After baseline recording, real-time analysis begins
-3. The console will display alerts when meditation markers are detected
-4. The plot title shows current frequency band powers and ratios
+### 5. Open in Browser
 
-### Recording EEG Data
+Navigate to: **http://localhost:8000**
 
-To record EEG data to CSV:
+1. Accept the medical disclaimer
+2. Select session type (Baseline or Post-Therapy)
+3. Complete 2-minute calibration
+4. Play the game - focus to raise the ball!
+5. End session and review metrics
+6. Export data for analysis
+
+## 🧪 Testing Without Muse Hardware
+
+Use the included simulator to test the app without a Muse device:
+
 ```bash
-python MindMonitorPython/OSC\ Receiver.py
+# Terminal 1: Start simulator
+python osc_simulator.py --mode auto --duration 30
+
+# Terminal 2: Start WebSocket server
+python websocket_server.py
+
+# Terminal 3: Start web app
+cd webapp
+python -m http.server 8000
 ```
-- Send Marker #1 to start recording
-- Send Marker #2 to stop recording
-- Data is saved to `OSC-Python-Recording.csv`
 
-## Configuration
+The simulator will cycle through low/medium/high focus states every 30 seconds.
 
-### OSC Settings
-- Default IP: `0.0.0.0` (listens on all interfaces)
-- Default Port: `5000`
-- OSC Path: `/muse/eeg`
+## 📖 Usage Guide
 
-### Analysis Parameters
-You can adjust thresholds in the `dispenza_*.py` scripts:
+### Session Workflow
+
+1. **Baseline Session** (Before Therapy)
+   - Select "Baseline Session"
+   - Complete calibration (2 min)
+   - Play game (5-10 min recommended)
+   - Save session data
+
+2. **Therapy/Intervention**
+   - Perform your sound therapy or intervention offline
+   - (e.g., harmonic resonant surface exposure)
+
+3. **Post-Therapy Session**
+   - Select "Post-Therapy Session"
+   - Complete calibration (2 min)
+   - Play game (same duration as baseline)
+   - Save session data
+
+4. **Compare Results**
+   - Click "View Past Comparisons"
+   - Select baseline and post-therapy sessions
+   - View improvement metrics
+
+### Understanding Metrics
+
+- **Concentration Score** (0-100): Composite measure of mental focus
+  - 0-40: Relaxed, low focus
+  - 40-70: Good concentration
+  - 70-100: Peak focus zone
+  
+- **Peak Score**: Highest concentration achieved during session
+
+- **Average Score**: Mean concentration over entire session
+
+- **High Focus Time**: Duration spent above 70% concentration
+
+### Game Controls
+
+- **No physical controls needed** - control with your mind!
+- **Focus** to raise the ball higher
+- **Relax** and the ball descends
+- Watch for **lilac particle effects** when you hit peak focus (70%+)
+
+## 🎨 Customization
+
+### Adjust Concentration Algorithm Weights
+
+Edit `websocket_server.py`:
+
 ```python
-THRESHOLDS = {
-    'theta_increase_factor': 1.3,    # 30% above baseline
-    'gamma_increase_factor': 1.15,    # 15% above baseline
-    'theta_beta_ratio': 2.0,          # Higher = deeper meditation
-    'theta_coherence': 0.75           # High synchronization
+WEIGHTS = {
+    'beta_alpha': 0.5,      # Engagement index (default 50%)
+    'smr': 0.3,             # Focus marker (default 30%)
+    'inv_theta_beta': 0.2   # Executive control (default 20%)
 }
 ```
 
-### Sampling Parameters
-- Sampling Rate: 256 Hz (Muse 2 default)
-- Window Size: 1024 samples (~4 seconds)
-- Update Interval: 1.0 second
+### Change Calibration Duration
 
-## Troubleshooting
+Edit `webapp/app.js`:
 
-### No data received
-- Verify Mind Monitor is streaming to the correct IP address and port
-- Check firewall settings (port 5000 must be open)
-- Ensure Muse headband is properly fitted (check HSI values in Mind Monitor)
+```javascript
+const CALIBRATION_DURATION = 120; // seconds (default 2 min)
+```
 
-### Poor signal quality
-- Ensure proper headband fit (all sensors should show good contact)
-- Clean sensor contacts with alcohol wipes
+### Adjust High Focus Threshold
+
+Edit `webapp/app.js`:
+
+```javascript
+const HIGH_FOCUS_THRESHOLD = 70; // score (default 70%)
+```
+
+## 📊 Data Export Format
+
+### CSV Export
+```csv
+Timestamp,Concentration Score
+2026-02-14T04:30:00.000Z,45.2
+2026-02-14T04:30:00.500Z,47.8
+...
+
+Session Summary
+Type,baseline
+Duration,300 seconds
+Average Score,52.3
+Peak Score,78.9
+High Focus Time,45 seconds
+```
+
+### JSON Export
+```json
+{
+  "type": "baseline",
+  "startTime": "2026-02-14T04:30:00.000Z",
+  "endTime": "2026-02-14T04:35:00.000Z",
+  "duration": 300,
+  "avgScore": 52.3,
+  "peakScore": 78.9,
+  "highFocusTime": 45,
+  "dataPoints": 600,
+  "scores": [45.2, 47.8, ...],
+  "timestamps": ["2026-02-14T04:30:00.000Z", ...]
+}
+```
+
+## 🔧 Troubleshooting
+
+### "WebSocket Disconnected"
+- Ensure `websocket_server.py` is running
+- Check firewall isn't blocking port 8765
+- Refresh browser page
+
+### "No EEG Data Received"
+- Verify Mind Monitor is streaming to correct IP and port 5000
+- Check Muse headband connection (all sensors green)
+- Ensure headband is properly fitted
+
+### "Poor Signal Quality"
+- Adjust headband fit (sensors should contact skin)
+- Clean sensor contacts with alcohol wipe
 - Minimize movement and electrical interference
+- Check battery level
 
-### Import errors
-- Make sure all dependencies are installed: `pip install numpy scipy matplotlib python-osc`
-- Use Python 3.7 or higher
+### Browser Compatibility Issues
+- Use latest Chrome, Firefox, Safari, or Edge
+- Enable JavaScript
+- Check browser console (F12) for errors
 
-## Credits
+## 📁 Project Structure
 
-- **Mind Monitor Python Samples**: The `MindMonitorPython/` directory contains sample code from Mind Monitor (licensed under GPL v3)
-- **Meditation Research**: Detection algorithms inspired by Dr. Joe Dispenza's research on transcendent meditation states
+```
+EEG-Game/
+├── websocket_server.py       # Backend WebSocket server
+├── osc_simulator.py          # EEG data simulator
+├── requirements.txt          # Python dependencies
+├── config.json               # Configuration file
+├── README.md                 # This file
+├── webapp/
+│   ├── index.html           # Main HTML structure
+│   ├── styles.css           # Lilac theme CSS
+│   ├── app.js               # Application logic
+│   ├── game.js              # Game visualization
+│   └── charts.js            # Data visualization
+└── EEG/                     # Original EEG analysis scripts
+    ├── osc_receiver.py
+    ├── dispenza_test.py
+    └── dispenza_stacked.py
+```
 
-## License
+## 🧬 Scientific Background
 
-- Main project: See LICENSE file (if present)
+### EEG vs fNIRS for Concentration
+
+- **Mendi (fNIRS)**: Measures blood oxygenation in prefrontal cortex during focus tasks
+- **This App (EEG)**: Measures electrical activity in prefrontal cortex via AF7 & AF8 electrodes
+
+Both methods target the same brain region and mental state, but EEG provides:
+- **Higher temporal resolution** (milliseconds vs seconds)
+- **Direct neural activity** (vs indirect hemodynamic response)
+- **Multiple validated metrics** (SMR, Beta/Alpha, Theta/Beta ratios)
+
+### Research References
+
+- **Beta/Alpha Ratio**: Validated engagement index for attention (Pope et al., 1995)
+- **SMR (12-15 Hz)**: Sensorimotor rhythm associated with focused attention (Sterman, 2000)
+- **Theta/Beta Ratio**: Marker for executive control and ADHD (Arns et al., 2013)
+- **Frontal Asymmetry**: Prefrontal cortex role in sustained attention (Davidson, 2004)
+
+## ⚠️ Disclaimer
+
+**This application is for personal experimentation and research purposes only.**
+
+This is NOT a medical device and should not be used for diagnosis, treatment, or medical decision-making. The concentration metrics and feedback provided are experimental and not clinically validated.
+
+If you have any medical concerns or conditions, please consult with a qualified healthcare professional.
+
+## 📄 License
+
+- Main project code: MIT License
 - MindMonitorPython samples: GPL v3 (see `MindMonitorPython/LICENSE`)
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit issues or pull requests.
+Contributions welcome! Please feel free to submit issues or pull requests.
 
-## Disclaimer
+## 💡 Future Enhancements
 
-This software is for research and educational purposes only. EEG data interpretation should not be used as a substitute for professional medical advice or diagnosis.
+- Mobile-responsive design for tablets
+- Multiple game modes and visualizations
+- Sound feedback (audio cues for focus states)
+- Advanced analytics (trend detection, correlations)
+- Integration with other EEG devices
+- Cloud storage for session history
+- Multi-user profiles
+
+## 📞 Support
+
+For issues or questions:
+1. Check the Troubleshooting section above
+2. Review existing GitHub issues
+3. Open a new issue with detailed description
+
+---
+
+**Happy Focus Training! 🧘‍♀️🧠✨**
+
+Built with ❤️ using scientifically-validated neurofeedback research

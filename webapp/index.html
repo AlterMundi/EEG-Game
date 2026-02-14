@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus — Neurofeedback Training</title>
+    <meta name="description" content="Train your focus gently with real-time EEG neurofeedback">
+
+    <!-- Fonts loaded via CSS @import -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Medical Disclaimer Modal -->
+    <div id="disclaimerModal" class="modal">
+        <div class="modal-content">
+            <h2>🌿 Before you begin</h2>
+            <p><strong>This app is for personal exploration only.</strong></p>
+            <p>This is NOT a medical device and should not be used for diagnosis, treatment, or medical decision-making.
+                The concentration metrics and feedback provided are experimental and not clinically validated.</p>
+            <p>If you have any medical concerns or conditions, please consult with a qualified healthcare professional.
+            </p>
+            <div class="disclaimer-actions">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="disclaimerCheck">
+                    <span>I understand and accept these terms</span>
+                </label>
+                <button id="disclaimerAccept" class="btn btn-primary" disabled>Let's begin ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="hidden">
+        <!-- Connection Status Bar -->
+        <div id="statusBar" class="status-bar">
+            <div class="status-item">
+                <span class="status-label">Connection:</span>
+                <span id="connectionStatus" class="status-value status-disconnected">Disconnected</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Signal Quality:</span>
+                <span id="signalQuality" class="status-value">—</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Session:</span>
+                <span id="sessionType" class="status-value">None</span>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <div class="screen-content">
+                <div class="logo-container">
+                    <h1 class="app-title"><span class="gradient-text">Focus</span></h1>
+                    <p class="app-subtitle">gentle neurofeedback training with your Muse 2</p>
+                </div>
+
+                <div class="session-selector">
+                    <h2>Select Session Type</h2>
+                    <div class="session-buttons">
+                        <button class="session-btn" data-session="baseline">
+                            <div class="session-icon">🫧</div>
+                            <h3>Baseline</h3>
+                            <p>Capture your natural focus before therapy</p>
+                        </button>
+                        <button class="session-btn" data-session="post-therapy">
+                            <div class="session-icon">🌿</div>
+                            <h3>Post-Therapy</h3>
+                            <p>See how your focus shifted after a session</p>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>How it works</h3>
+                    <ul>
+                        <li>Wear your Muse 2 headband — make sure the signal is clear</li>
+                        <li>Sit comfortably for a 1-minute calibration</li>
+                        <li>Settle your mind and let the ball respond to your focus</li>
+                        <li>Save and compare sessions to track your progress</li>
+                    </ul>
+                </div>
+
+                <button id="viewComparisonBtn" class="btn btn-secondary">
+                    Compare past sessions
+                </button>
+            </div>
+        </div>
+
+        <!-- Calibration Screen -->
+        <div id="calibrationScreen" class="screen">
+            <div class="screen-content centered">
+                <h1>Calibrating ✦</h1>
+                <p class="calibration-instruction">Relax and let your mind be still for a moment</p>
+                <p class="calibration-tip">Close your eyes, breathe gently, just be.</p>
+
+                <div class="calibration-timer">
+                    <svg class="progress-ring" width="200" height="200">
+                        <defs>
+                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#9B7EDC" />
+                                <stop offset="100%" stop-color="#7DD4B3" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="progress-ring-circle" stroke="#E6DEFF" stroke-width="6" fill="transparent" r="90"
+                            cx="100" cy="100" />
+                        <circle id="progressCircle" class="progress-ring-circle progress"
+                            stroke="url(#progressGradient)" stroke-width="6" fill="transparent" r="90" cx="100"
+                            cy="100" />
+                    </svg>
+                    <div class="timer-text">
+                        <span id="calibrationTimer" class="timer-value">1:00</span>
+                        <span class="timer-label">remaining</span>
+                    </div>
+                </div>
+
+                <div class="calibration-samples">
+                    <span>Samples: <span id="sampleCount">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen">
+            <div class="game-header">
+                <div class="game-stat">
+                    <span class="stat-label">Time</span>
+                    <span id="gameTime" class="stat-value">0:00</span>
+                </div>
+                <div class="game-stat highlight">
+                    <span class="stat-label">Concentration</span>
+                    <span id="concentrationDisplay" class="stat-value">0</span>
+                </div>
+                <div class="game-stat">
+                    <span class="stat-label">Peak</span>
+                    <span id="peakScore" class="stat-value">0</span>
+                </div>
+            </div>
+
+            <div class="game-container">
+                <canvas id="gameCanvas"></canvas>
+
+                <div class="game-zones">
+                    <div class="zone zone-high">🌿 Flow</div>
+                    <div class="zone zone-medium">☁️ Settling</div>
+                    <div class="zone zone-low">🫧 Resting</div>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button id="endSessionBtn" class="btn btn-secondary">End Session</button>
+            </div>
+
+            <div class="game-tip">
+                <span id="gameTip">Breathe and let your mind settle</span>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="screen">
+            <div class="screen-content">
+                <h1>Session Complete 🌸</h1>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div class="result-icon">📊</div>
+                        <div class="result-label">Average Score</div>
+                        <div id="avgScore" class="result-value">--</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-icon">⭐</div>
+                        <div class="result-label">Peak Score</div>
+                        <div id="peakScoreResult" class="result-value">--</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-icon">⏱️</div>
+                        <div class="result-label">Duration</div>
+                        <div id="durationResult" class="result-value">--</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-icon">🎯</div>
+                        <div class="result-label">High Focus Time</div>
+                        <div id="highFocusTime" class="result-value">--</div>
+                    </div>
+                </div>
+
+                <canvas id="resultsChart"></canvas>
+
+                <div class="results-actions">
+                    <button id="exportCSV" class="btn btn-secondary">Export CSV</button>
+                    <button id="exportJSON" class="btn btn-secondary">Export JSON</button>
+                    <button id="newSessionBtn" class="btn btn-primary">New Session</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Screen -->
+        <div id="comparisonScreen" class="screen">
+            <div class="screen-content">
+                <h1>Session Comparison</h1>
+
+                <div class="comparison-selector">
+                    <div class="selector-group">
+                        <label>Baseline Session:</label>
+                        <select id="baselineSelect"></select>
+                    </div>
+                    <div class="selector-group">
+                        <label>Post-Therapy Session:</label>
+                        <select id="postTherapySelect"></select>
+                    </div>
+                    <button id="compareBtn" class="btn btn-primary">Compare</button>
+                </div>
+
+                <div id="comparisonResults" class="hidden">
+                    <div class="improvement-banner">
+                        <h2>Overall Improvement</h2>
+                        <div id="improvementPercent" class="improvement-value">+0%</div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-card">
+                            <h3>Average Score</h3>
+                            <div class="comparison-values">
+                                <div class="value-item">
+                                    <span class="value-label">Baseline</span>
+                                    <span id="baselineAvg" class="value-number">--</span>
+                                </div>
+                                <div class="value-arrow">→</div>
+                                <div class="value-item">
+                                    <span class="value-label">Post-Therapy</span>
+                                    <span id="postTherapyAvg" class="value-number">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="comparison-card">
+                            <h3>High Focus Duration</h3>
+                            <div class="comparison-values">
+                                <div class="value-item">
+                                    <span class="value-label">Baseline</span>
+                                    <span id="baselineHighFocus" class="value-number">--</span>
+                                </div>
+                                <div class="value-arrow">→</div>
+                                <div class="value-item">
+                                    <span class="value-label">Post-Therapy</span>
+                                    <span id="postTherapyHighFocus" class="value-number">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+
+                <button id="backToStartBtn" class="btn btn-secondary">← Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script src="game.js"></script>
+    <script src="charts.js"></script>
+</body>
+
+</html>

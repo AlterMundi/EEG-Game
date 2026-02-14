@@ -1,0 +1,15 @@
+{
+    "osc_port": 5000,
+    "websocket_port": 8765,
+    "sampling_rate": 256,
+    "window_size": 1024,
+    "update_interval": 0.5,
+    "calibration_duration": 120,
+    "concentration_weights": {
+        "beta_alpha": 0.5,
+        "smr": 0.3,
+        "inv_theta_beta": 0.2
+    },
+    "smoothing_factor": 0.7,
+    "high_focus_threshold": 70
+}

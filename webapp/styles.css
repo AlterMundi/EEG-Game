@@ -470,6 +470,33 @@ h3 {
     line-height: 1.5;
 }
 
+.session-duration {
+    display: inline-block;
+    margin-top: var(--spacing-sm);
+    padding: 4px 14px;
+    background: var(--lavender-light);
+    border-radius: var(--radius-pill);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--amethyst);
+    letter-spacing: 0.5px;
+}
+
+.session-btn-free {
+    margin-top: var(--spacing-md);
+    width: 100%;
+    border-style: dashed;
+    border-color: var(--mint);
+}
+
+.session-btn-free h3 {
+    color: var(--seafoam);
+}
+
+.session-btn-free:hover {
+    border-color: var(--seafoam);
+}
+
 .info-card {
     background: var(--bg-card);
     border: 1px solid rgba(212, 196, 245, 0.3);

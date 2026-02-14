@@ -6,17 +6,19 @@
 // ==================== CONFIGURATION ====================
 const WEBSOCKET_URL = 'ws://localhost:8765';
 const CALIBRATION_DURATION = 60; // 1 minute
+const SESSION_DURATION = 300; // 5 minutes for timed sessions
 const HIGH_FOCUS_THRESHOLD = 70; // Score above this = high focus
 
 // ==================== STATE ====================
 class AppState {
     constructor() {
         this.currentScreen = 'start';
-        this.sessionType = null; // 'baseline' or 'post-therapy'
+        this.sessionType = null; // 'baseline', 'post-therapy', or 'free'
         this.isCalibrating = false;
         this.isGameActive = false;
         this.sessionStartTime = null;
         this.currentSession = null;
+        this.isTimedSession = false; // true for baseline/post-therapy
     }
 }
 
@@ -273,6 +275,7 @@ function startGame() {
     showScreen('game');
 
     appState.isGameActive = true;
+    appState.isTimedSession = (appState.sessionType !== 'free');
     appState.currentSession = new Session(appState.sessionType);
     gameStartTime = Date.now();
 
@@ -281,16 +284,35 @@ function startGame() {
         window.initGame();
     }
 
+    // Update the end button text
+    const endBtn = document.getElementById('endSessionBtn');
+    endBtn.textContent = appState.isTimedSession ? 'End Early' : 'End Session';
+
     // Start game timer
     gameInterval = setInterval(updateGameTimer, 1000);
 }
 
 function updateGameTimer() {
     const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-    const minutes = Math.floor(elapsed / 60);
-    const seconds = elapsed % 60;
-    document.getElementById('gameTime').textContent =
-        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+    if (appState.isTimedSession) {
+        // Countdown for timed sessions
+        const remaining = Math.max(0, SESSION_DURATION - elapsed);
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+        document.getElementById('gameTime').textContent =
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        if (remaining <= 0) {
+            endGame();
+        }
+    } else {
+        // Count up for free sessions
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById('gameTime').textContent =
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
 }
 
 function endGame() {
